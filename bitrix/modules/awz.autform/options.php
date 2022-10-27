@@ -85,33 +85,6 @@ $tabControl->BeginNextTab();
 </tr>
 <?}?>
 
-<tr class="heading">
-    <td colspan="2">
-        <?=Loc::getMessage('AWZ_EUROPOST_OPT_L_GROUP1')?>
-    </td>
-</tr>
-<tr>
-    <td colspan="2" align="center">
-        <div class="adm-info-message-wrap">
-            <div class="adm-info-message">
-                <div> <?=Loc::getMessage('AWZ_EUROPOST_OPT_L_GROUP1_DESC')?></div>
-            </div>
-        </div>
-    </td>
-</tr>
-<tr>
-    <td width="50%"><?=Loc::getMessage('AWZ_EUROPOST_OPT_L_DELPVZ')?></td>
-    <td>
-        <?$val = "N";?>
-        <input type="checkbox" value="Y" name="DELETE_PVZ" <?if ($val=="Y") echo "checked";?>></td>
-</tr>
-<tr>
-    <td width="50%"><?=Loc::getMessage('AWZ_EUROPOST_OPT_L_UPPVZ')?></td>
-    <td>
-        <?$val = "N";?>
-        <input type="checkbox" value="Y" name="UPDATE_PVZ" <?if ($val=="Y") echo "checked";?>></td>
-</tr>
-
 <?
 $tabControl->BeginNextTab();
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/admin/group_rights.php");
