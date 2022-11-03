@@ -24,4 +24,24 @@ class Events {
      */
     const FIND_USER = 'onFindUser';
 
+    /**
+     * Своя проверка лимитов
+     */
+    const CHECK_LIMITS = 'onCheckLimits';
+
+    /**
+     * После проверки лимитов
+     */
+    const AFTER_CHECK_LIMITS = 'onAfterCheckLimits';
+
+    /**
+     * После входа через смс
+     */
+    const AFTER_AUTH_SMS = 'onAfterAuthSms';
+
+    /**
+     * После входа по паролю
+     */
+    const AFTER_AUTH_PSW = 'onAfterAuthPsw';
+
 }

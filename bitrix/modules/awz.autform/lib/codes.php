@@ -9,17 +9,27 @@ Loc::loadMessages(__FILE__);
 
 class CodesTable extends Entity\DataManager
 {
-    public static function getFilePath()
+    /**
+     * @return string
+     */
+    public static function getFilePath(): string
     {
         return __FILE__;
     }
 
-    public static function getTableName()
+    /**
+     * @return string
+     */
+    public static function getTableName(): string
     {
         return 'b_awz_autform_codes';
     }
 
-    public static function getMap()
+    /**
+     * @return array
+     * @throws \Bitrix\Main\SystemException
+     */
+    public static function getMap(): array
     {
         return array(
             new Entity\IntegerField('ID', array(
@@ -36,6 +46,11 @@ class CodesTable extends Entity\DataManager
             new Entity\StringField('CODE', array(
                     'required' => true,
                     'title'=>Loc::getMessage('AWZ_AUTFORM_CODES_FIELDS_CODE')
+                )
+            ),
+            new Entity\StringField('IP_STR', array(
+                    'required' => true,
+                    'title'=>Loc::getMessage('AWZ_AUTFORM_CODES_FIELDS_IP_STR')
                 )
             ),
             new Entity\DatetimeField('CREATE_DATE', array(

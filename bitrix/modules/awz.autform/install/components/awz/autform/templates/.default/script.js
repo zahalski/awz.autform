@@ -4,35 +4,66 @@ function AwzAutFormComponent(){}
 
 AwzAutFormComponent.prototype = {
     modeOptions: {
+        //вход по паролю с смс
         login: {
             show: ['buttons-aut','group-password'],
             hide: ['buttons-checkcode', 'buttons-getcode', 'buttons-register', 'group-smscode'],
-            title: 'AWZ_AUTFORM_TMPL_TITLE_AUTH'
+            title: 'AWZ_AUTFORM_TMPL_TITLE_AUTH',
+            active_link: 'login'
         },
+        //вход по паролю без смс
         loginnosms: {
             show: ['buttons-aut','group-password'],
             hide: ['buttons-checkcode', 'buttons-getcode', 'buttons-register', 'group-smscode', 'group-smslink'],
-            title: 'AWZ_AUTFORM_TMPL_TITLE_AUTH'
+            title: 'AWZ_AUTFORM_TMPL_TITLE_AUTH',
+            active_link: 'login'
         },
+        //вход по смс (выслать код)
         loginsms: {
             show: ['buttons-getcode'],
             hide: ['buttons-checkcode', 'buttons-aut','group-password', 'buttons-register', 'group-smscode'],
-            title: 'AWZ_AUTFORM_TMPL_TITLE_AUTHSMS'
+            title: 'AWZ_AUTFORM_TMPL_TITLE_AUTHSMS',
+            active_link: 'loginsms'
         },
+        //подтверждение кода в смс (проверка кода)
         logincode: {
             show: ['buttons-checkcode','group-smscode'],
             hide: ['buttons-aut', 'buttons-getcode', 'buttons-register', 'group-password'],
-            title: 'AWZ_AUTFORM_TMPL_TITLE_AUTHSMS'
+            title: 'AWZ_AUTFORM_TMPL_TITLE_AUTHSMS',
+            active_link: 'loginsms'
+        },
+        //регистрация по смс (выслать код)
+        register: {
+            show: ['buttons-getcode'],
+            hide: ['buttons-aut', 'buttons-register','buttons-checkcode', 'group-password','group-smscode'],
+            title: 'AWZ_AUTFORM_TMPL_TITLE_REGISTER',
+            active_link: 'register'
+        },
+        //подтверждение регистрации (проверка кода)
+        registercode: {
+            show: ['buttons-register','group-smscode'],
+            hide: ['buttons-aut', 'buttons-getcode','buttons-checkcode', 'group-password'],
+            title: 'AWZ_AUTFORM_TMPL_TITLE_REGISTER',
+            active_link: 'register'
         }
     },
     activate: function (options) {
         if(typeof options !== 'object') options = {};
         this.theme = (!!options.theme ? options.theme : false) || 'red';
+        this.hiddenReg = (!!options.hiddenReg ? (options.hiddenReg==='Y') : false);
+        this.AGREEMENT = (!!options.AGREEMENT ? options.AGREEMENT : false) || '';
         this.lang = (!!options.lang ? options.lang : false) || {};
         if(typeof this.lang !==  'object') this.lang = {};
-        this.ajaxTimer = 1000;
+        this.ajaxTimer = 100;
         this.debug = false;
         this.autForm = BX(this.autFormId);
+        if(this.hiddenReg){
+            this.modeOptions.register.title = this.modeOptions.loginsms.title;
+            this.modeOptions.registercode.title = this.modeOptions.loginsms.title;
+            this.modeOptions.register.active_link = this.modeOptions.loginsms.active_link;
+            this.modeOptions.registercode.active_link = this.modeOptions.loginsms.active_link;
+        }
+        this.modes = (!!options.modes ? options.modes : false) || [];
         this.setMode((!!options.mode ? options.mode : false) || 'login');
         this.initHandlers();
     },
@@ -58,11 +89,26 @@ AwzAutFormComponent.prototype = {
     close: function(e){
         if(!!e)
             e.preventDefault();
+
+        if(!!BX(this.autFormId+'_content_agreement')){
+            BX.removeClass(BX(this.autFormId+'_form'),'awz-autform-hide');
+            BX(this.autFormId+'_content_agreement').remove();
+            this.popupSize();
+            return;
+        }
+
         BX(this.autFormId+'_modal').remove();
     },
     checkHidden: function(){
 
         if(!this.mode) return;
+
+        if(BX(this.autFormId+'_link_login'))
+            BX.removeClass(BX(this.autFormId+'_link_login'), 'active');
+        if(BX(this.autFormId+'_link_loginsms'))
+            BX.removeClass(BX(this.autFormId+'_link_loginsms'), 'active');
+        if(BX(this.autFormId+'_link_register'))
+            BX.removeClass(BX(this.autFormId+'_link_register'), 'active');
 
         var k;
         for (k in this.modeOptions[this.mode].show){
@@ -76,6 +122,148 @@ AwzAutFormComponent.prototype = {
         if(BX(this.autFormId+'_title'))
             BX.adjust(BX(this.autFormId+'_title'), {html: this.loc(this.modeOptions[this.mode].title)});
 
+        if(!this.AGREEMENT){
+            BX.addClass(BX('awz-autform-form-agreement'),'awz-autform-hide');
+        }else{
+            BX.removeClass(BX('awz-autform-form-agreement'),'awz-autform-hide');
+        }
+
+        var lnk_active = BX(this.autFormId+'_link_'+this.modeOptions[this.mode]['active_link']);
+        if(lnk_active)
+            BX.addClass(lnk_active, 'active');
+
+        var len_fix = 0;
+        if(typeof this.modes === 'object')
+            len_fix = this.modes.length - (this.hiddenReg ? 1 : 0);
+        if(this.modes && len_fix < 2){
+            if(BX(this.autFormId+'_links'))
+                BX(this.autFormId+'_links').remove();
+        }
+
+    },
+    readOkAction: function(e){
+        if(!!e)
+            e.preventDefault();
+
+        BX.removeClass(BX(this.autFormId+'_form'),'awz-autform-hide');
+        BX(this.autFormId+'_content_agreement').remove();
+        this.popupSize();
+    },
+    clickFormLink: function(e){
+        if(!!e)
+            e.preventDefault();
+        var el = BX(e.target);
+        if(!el) return;
+        var type = el.getAttribute('data-type');
+        this.setMode(type);
+
+        this.deleteErr();
+        this.deleteMessage();
+
+        if(!!BX(this.autFormId+'_content_agreement')){
+            BX.removeClass(BX(this.autFormId+'_form'),'awz-autform-hide');
+            BX(this.autFormId+'_content_agreement').remove();
+        }
+
+        this.popupSize();
+
+    },
+    agreementAction: function(e){
+        if(!!e)
+            e.preventDefault();
+        var parent = this;
+
+        this.showLoader();
+        setTimeout(function(){
+            BX.ajax.runComponentAction('awz:autform', 'getAgreement', {
+                mode: 'class',
+                data: {
+                    fmode: parent.mode,
+                    signedParameters: parent.signedParameters,
+                    method: 'POST'
+                }
+            }).then(function (response) {
+                parent.deleteErr();
+                parent.deleteMessage();
+                parent.hideLoader();
+                if(response && response.hasOwnProperty('data') && response['data'] && response['data'].hasOwnProperty('text')){
+
+                    BX.addClass(BX(parent.autFormId+'_form'),'awz-autform-hide');
+                    BX.append(
+                        BX.create(
+                            {
+                                tag: 'div',
+                                attrs:{
+                                    id: parent.autFormId+'_content_agreement',
+                                    className: 'awz-autform-message-agreement'
+                                },
+                                children: [
+                                    BX.create({
+                                        tag: 'div',
+                                        attrs:{
+                                            className: 'awz-autform-message-agreement-content'
+                                        },
+                                        text: response['data'].text
+                                    }),
+                                    BX.create(
+                                        {
+                                            tag: 'div',
+                                            attrs:{
+                                                className: 'awz-autform-form-buttons'
+                                            },
+                                            children: [
+                                                BX.create({
+                                                    tag: 'button',
+                                                    props: {
+                                                    },
+                                                    events: {
+                                                        click: BX.proxy(parent.readOkAction, parent)
+                                                    },
+                                                    text: parent.loc('AWZ_AUTFORM_TMPL_LABEL_BTN_READ')
+                                                }),
+                                            ]
+                                        }
+                                    ),
+                                ]
+                            }
+                        ),
+                        BX(parent.autFormId+'_ac')
+                    );
+                }
+            }, function (response) {
+                parent.showErrors(response);
+            });
+        },this.ajaxTimer);
+    },
+    checkRegisterAction: function(e){
+        if(!!e)
+            e.preventDefault();
+        var parent = this;
+
+        this.showLoader();
+
+        setTimeout(function(){
+            BX.ajax.runComponentAction('awz:autform', 'checkRegister', {
+                mode: 'class',
+                data: {
+                    AGREEMENT: parent.getAgreementCheckBox(),
+                    phone: BX(parent.autFormId+'_phone').value,
+                    code: BX(parent.autFormId+'_smscode').value,
+                    fmode: parent.mode,
+                    signedParameters: parent.signedParameters,
+                    method: 'POST'
+                }
+            }).then(function (response) {
+                parent.deleteErr();
+                parent.deleteMessage();
+                parent.hideLoader();
+                if(response && response.hasOwnProperty('data') && response['data'] && response['data'].hasOwnProperty('user')){
+                    window.location.reload();
+                }
+            }, function (response) {
+                parent.showErrors(response);
+            });
+        },this.ajaxTimer);
     },
     checkCodeAction: function(e){
         if(!!e)
@@ -88,8 +276,10 @@ AwzAutFormComponent.prototype = {
             BX.ajax.runComponentAction('awz:autform', 'checkCode', {
                 mode: 'class',
                 data: {
+                    AGREEMENT: parent.getAgreementCheckBox(),
                     phone: BX(parent.autFormId+'_phone').value,
                     code: BX(parent.autFormId+'_smscode').value,
+                    fmode: parent.mode,
                     signedParameters: parent.signedParameters,
                     method: 'POST'
                 }
@@ -97,7 +287,7 @@ AwzAutFormComponent.prototype = {
                 parent.deleteErr();
                 parent.deleteMessage();
                 parent.hideLoader();
-                if(response.hasOwnProperty('data') && response['data'].hasOwnProperty('user')){
+                if(response && response.hasOwnProperty('data') && response['data'] && response['data'].hasOwnProperty('user')){
                     window.location.reload();
                 }
             }, function (response) {
@@ -116,7 +306,9 @@ AwzAutFormComponent.prototype = {
             BX.ajax.runComponentAction('awz:autform', 'getCode', {
                 mode: 'class',
                 data: {
+                    AGREEMENT: parent.getAgreementCheckBox(),
                     phone: BX(parent.autFormId+'_phone').value,
+                    fmode: parent.mode,
                     signedParameters: parent.signedParameters,
                     method: 'POST'
                 }
@@ -124,18 +316,30 @@ AwzAutFormComponent.prototype = {
                 parent.deleteErr();
                 parent.deleteMessage();
                 parent.hideLoader();
-                if(response.hasOwnProperty('data') && response['data'].hasOwnProperty('phone')){
+                if(response && response.hasOwnProperty('data') && response['data'] && response['data'].hasOwnProperty('phone')){
                     BX(parent.autFormId+'_phone').value = response['data']['phone'];
                 }
-                if(response.hasOwnProperty('data')){
+                if(response && response.hasOwnProperty('data')) {
                     parent.showMessage(response['data']);
                 }
-                parent.setMode('logincode');
-            }, function (response) {
-                parent.showErrors(response);
-                if(response.hasOwnProperty('data') && response['data'].hasOwnProperty('step')){
+                if(response && response.hasOwnProperty('data') && response['data'] && response['data'].hasOwnProperty('step')){
                     if(response['data']['step'] === 'active-code'){
                         parent.setMode('logincode');
+                    }
+                    if(response['data']['step'] === 'active-code-register'){
+                        parent.setMode('registercode');
+                    }
+                }else{
+                    parent.setMode('logincode');
+                }
+            }, function (response) {
+                parent.showErrors(response);
+                if(response && response.hasOwnProperty('data') && response['data'] && response['data'].hasOwnProperty('step')){
+                    if(response['data']['step'] === 'active-code'){
+                        parent.setMode('logincode');
+                    }
+                    if(response['data']['step'] === 'active-code-register'){
+                        parent.setMode('registercode');
                     }
                 }
             });
@@ -152,8 +356,10 @@ AwzAutFormComponent.prototype = {
             BX.ajax.runComponentAction('awz:autform', 'checkAuth', {
                 mode: 'class',
                 data: {
+                    AGREEMENT: parent.getAgreementCheckBox(),
                     phone: BX(parent.autFormId+'_phone').value,
                     password: BX(parent.autFormId+'_password').value,
+                    fmode: parent.mode,
                     signedParameters: parent.signedParameters,
                     method: 'POST'
                 }
@@ -161,7 +367,7 @@ AwzAutFormComponent.prototype = {
                 parent.deleteErr();
                 parent.deleteMessage();
                 parent.hideLoader();
-                if(response.hasOwnProperty('data') && response['data'].hasOwnProperty('user')){
+                if(response && response.hasOwnProperty('data') && response['data'] && response['data'].hasOwnProperty('user')){
                     window.location.reload();
                 }
             }, function (response) {
@@ -204,7 +410,7 @@ AwzAutFormComponent.prototype = {
         if(!!BX(this.autFormId+'_msg')) BX(this.autFormId+'_msg').remove();
     },
     showErrors: function(data){
-        if(data.hasOwnProperty('status') && data.status === 'error'){
+        if(data && data.hasOwnProperty('status') && data.status === 'error'){
             this.deleteErr();
             this.deleteMessage();
             BX.prepend(BX.create({
@@ -243,7 +449,7 @@ AwzAutFormComponent.prototype = {
         this.hideLoader();
     },
     showMessage: function(data){
-        if(data.hasOwnProperty('message')){
+        if(data && data.hasOwnProperty('message')){
             this.deleteMessage();
             BX.prepend(BX.create({
                 tag: 'div',
@@ -266,15 +472,24 @@ AwzAutFormComponent.prototype = {
         this.hideLoader();
     },
     createPopup: function(){
+        //TODO unbind events
         BX.append(BX.create('div',{attrs:{id: this.autFormId+'_modal'}, props: {className: 'awz-autform-theme-'+this.theme}}), BX(document.body));
         BX.adjust(BX(this.autFormId+'_modal'), {html: this.template()});
         BX.bind(BX(this.autFormId+'_close'), 'click', BX.proxy(this.close, this));
         this.popupSize();
+        var parent = this;
+        BX.bind(window, 'resize', function(){
+            parent.popupSize();
+        });
     },
     popupSize: function(){
         var h = BX.height(window);
         var w = BX.width(window);
         if(w > 860) {
+            if(!!BX(this.autFormId+'_close'))
+                BX.removeClass(BX(this.autFormId+'_close'),'awz-autform-close-mobile');
+            if(!!BX(this.autFormId+'_modal'))
+                BX.removeClass(BX(this.autFormId+'_modal'),'awz-autform-modal-mobile');
             w = Math.ceil(w*0.8);
             h = Math.ceil(h*0.8);
 
@@ -291,19 +506,34 @@ AwzAutFormComponent.prototype = {
                 }
             );
         }else{
-            BX.addClass(BX(this.autFormId+'_close'),'awz-ep-close-mobile');
+            BX.addClass(BX(this.autFormId+'_close'),'awz-autform-close-mobile');
+            BX.addClass(BX(this.autFormId+'_modal'),'awz-autform-modal-mobile');
             w = Math.ceil(w);
             h = Math.ceil(h);
             BX.adjust(
                 BX(this.autFormId+'_content'),
                 {
                     style: {
+                        'margin-top':'0px',
                         'width':w+'px',
                         'height': h+'px'
                     }
                 }
             );
         }
+        BX.adjust(
+            BX(this.autFormId+'_body'),
+            {
+                style: {
+                    'height': (h-BX.height(BX(this.autFormId+'_title')))+'px'
+                }
+            }
+        );
+    },
+    getAgreementCheckBox: function(){
+        var checkBox = BX(this.autFormId+'_agreement');
+        if(!checkBox) return 'N';
+        return checkBox.checked ? 'Y' : 'N'
     },
     loader_template: function(){
         var loader_mess = this.loc('AWZ_AUTFORM_TMPL_LOADER');
@@ -322,7 +552,7 @@ AwzAutFormComponent.prototype = {
                     '<div class="awz-autform-modal-header" id="'+this.autFormId+'_title">'+
                     ''+this.loc('AWZ_AUTFORM_TMPL_TITLE_AUTH')+
                     '</div>'+
-                    '<div class="awz-autform-modal-body">' +
+                    '<div class="awz-autform-modal-body" id="'+this.autFormId+'_body">' +
                         '<div id="'+this.autFormId+'_ac" class="awz-autform-contentWrap"></div>' +
                     '</div>'+
                 '</div>' +
@@ -331,6 +561,52 @@ AwzAutFormComponent.prototype = {
         return ht;
     },
     loginForm: function(){
+
+        var active_links = [];
+        if(this.modes && this.modes.indexOf('login')>-1){
+            active_links.push(BX.create({
+                tag: 'a',
+                props: {id: this.autFormId+'_link_login', href: '#'},
+                attrs: {'data-type': 'login'},
+                events: {
+                    click: BX.proxy(this.clickFormLink, this)
+                },
+                text: this.loc('AWZ_AUTFORM_TMPL_TITLE_AUTH')
+            }));
+        }
+        if(this.modes && this.modes.indexOf('loginsms')>-1){
+            active_links.push(BX.create({
+                tag: 'a',
+                props: {id: this.autFormId+'_link_loginsms', href: '#'},
+                attrs: {'data-type': 'loginsms'},
+                events: {
+                    click: BX.proxy(this.clickFormLink, this)
+                },
+                text: this.loc('AWZ_AUTFORM_TMPL_TITLE_AUTHSMS')
+            }));
+        }
+        if(this.modes && this.modes.indexOf('register')>-1 && !this.hiddenReg){
+            active_links.push(BX.create({
+                tag: 'a',
+                props: {id: this.autFormId+'_link_register', href: '#'},
+                attrs: {'data-type': 'register'},
+                events: {
+                    click: BX.proxy(this.clickFormLink, this)
+                },
+                text: this.loc('AWZ_AUTFORM_TMPL_TITLE_REGISTER')
+            }));
+        }
+
+        var links = BX.create({
+            tag: 'div',
+            props: {
+                className: "awz-autform-form-links",
+                id: this.autFormId+'_links'
+            },
+            children: active_links
+        });
+
+
 
         var form = BX.create({
             tag: 'form',
@@ -382,7 +658,7 @@ AwzAutFormComponent.prototype = {
                                     tag: 'span',
                                     text: this.loc('AWZ_AUTFORM_TMPL_LABEL_PASSW'),
                                 }),
-                                BX.create({
+                                /*BX.create({
                                     tag: 'a',
                                     props: {
                                         href: '#',
@@ -392,7 +668,7 @@ AwzAutFormComponent.prototype = {
                                         click: BX.proxy(this.getCodeAction, this)
                                     },
                                     text: this.loc('AWZ_AUTFORM_TMPL_LABEL_BTN_CODE2'),
-                                })
+                                })*/
                             ]
                         }),
                         BX.create({
@@ -451,6 +727,7 @@ AwzAutFormComponent.prototype = {
                                         type:'text',
                                         className:'awz-autform-form-control',
                                         name: 'awz-smscode',
+                                        autocomplete: 'off'
                                     }
                                 }),
                             ]
@@ -458,6 +735,37 @@ AwzAutFormComponent.prototype = {
 
                     ]
                 }),
+
+                BX.create({
+                    tag: 'div',
+                    props: {
+                        className: "awz-autform-form-agreement",
+                        id: "awz-autform-form-agreement"
+                    },
+                    children: [
+                        BX.create({
+                            tag: 'input',
+                            props: {
+                                type: 'checkbox',
+                                checked: 'checked',
+                                value: 'Y',
+                                name: this.autFormId+'_agreement',
+                                id: this.autFormId+'_agreement'
+                            },
+                        }),
+                        BX.create({
+                            tag: 'a',
+                            props: {
+                                href: '#'
+                            },
+                            events: {
+                                click: BX.proxy(this.agreementAction, this)
+                            },
+                            text: this.loc('AWZ_AUTFORM_TMPL_LABEL_AGREEMENT')
+                        }),
+                    ]
+                }),
+
                 BX.create({
                     tag: 'div',
                     props: {
@@ -492,9 +800,9 @@ AwzAutFormComponent.prototype = {
                                 className:'awz-autform-form-control',
                             },
                             events: {
-                                click: BX.proxy(this.getCodeRegisterAction, this)
+                                click: BX.proxy(this.checkRegisterAction, this)
                             },
-                            text: this.loc('AWZ_AUTFORM_TMPL_LABEL_BTN_CODE')
+                            text: this.loc('AWZ_AUTFORM_TMPL_LABEL_BTN_REGISTER')
                         }),
                     ]
                 }),
@@ -541,7 +849,16 @@ AwzAutFormComponent.prototype = {
             ]
         });
 
-        return form;
+        return BX.create({
+            tag: 'div',
+            props: {
+                className: "awz-autform-form-prepare-wrapper",
+            },
+            children: [
+                links,
+                form
+            ]
+        });
 
     }
 };

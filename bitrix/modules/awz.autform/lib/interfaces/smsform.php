@@ -2,6 +2,9 @@
 
 namespace Awz\AutForm\Interfaces;
 
+use Bitrix\Main\EventResult;
+use Bitrix\Main\Event;
+
 interface SmsForm {
 
     /**
@@ -10,7 +13,7 @@ interface SmsForm {
      * @param string $value
      * @return string
      */
-    public static function tmplHtml(string $value);
+    public static function tmplHtml(string $value): string;
 
     /**
      * Формирование массива параметров шаблона смс для сохранения
@@ -18,14 +21,14 @@ interface SmsForm {
      * @param array $arFields
      * @return array
      */
-    public static function tmplHtmlSave(array $arFields);
+    public static function tmplHtmlSave(array $arFields): array;
 
     /**
      * Взаимодействие с смс модулем и отправка смс
      *
-     * @param \Bitrix\Main\Event $event
-     * @return \Bitrix\Main\Result or null
+     * @param Event $event
+     * @return EventResult|null
      */
-    public static function OnAfterAddEvent(\Bitrix\Main\Event $event);
+    public static function OnAfterAddEvent(Event $event): ?EventResult;
 
 }

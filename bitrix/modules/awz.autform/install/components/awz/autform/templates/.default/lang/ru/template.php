@@ -1,5 +1,5 @@
 <?php
-$MESS['AWZ_AUTFORM_TMPL_TITLE_AUTH'] = 'Вход на сайт';
+$MESS['AWZ_AUTFORM_TMPL_TITLE_AUTH'] = 'Вход по паролю';
 $MESS['AWZ_AUTFORM_TMPL_TITLE_AUTHSMS'] = 'Вход через смс';
 $MESS['AWZ_AUTFORM_TMPL_TITLE_REGISTER'] = 'Регистрация';
 $MESS['AWZ_AUTFORM_TMPL_CLOSE'] = 'Закрыть';
@@ -12,4 +12,8 @@ $MESS['AWZ_AUTFORM_TMPL_LABEL_BTN_AUTH'] = 'Войти';
 $MESS['AWZ_AUTFORM_TMPL_LABEL_BTN_CODE'] = 'Получить код';
 $MESS['AWZ_AUTFORM_TMPL_LABEL_BTN_CODE2'] = 'Получить в смс';
 $MESS['AWZ_AUTFORM_TMPL_LABEL_BTN_CHECKCODE'] = 'Подтвердить вход';
+$MESS['AWZ_AUTFORM_TMPL_LABEL_BTN_REGISTER'] = 'Зарегистрироваться';
 $MESS['AWZ_AUTFORM_TMPL_LOADER'] = 'Идет загрузка...';
+$MESS['AWZ_AUTFORM_TMPL_PERSONAL_LINK'] = 'Личный кабинет';
+$MESS['AWZ_AUTFORM_TMPL_LABEL_AGREEMENT'] = 'Я согласен с условиями обработки данных';
+$MESS['AWZ_AUTFORM_TMPL_LABEL_BTN_READ'] = 'Прочитано';
