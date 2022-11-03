@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admi
 
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Config\Option;
-use \Bitrix\Main\Loader;
+use Bitrix\Main\Loader;
 Loc::loadMessages(__FILE__);
 global $APPLICATION;
 $module_id = "awz.autform";
@@ -21,10 +21,16 @@ Loader::includeModule($module_id);
 if ($_SERVER["REQUEST_METHOD"] == "POST" && $MODULE_RIGHT == "W" && strlen($_REQUEST["Update"]) > 0 && check_bitrix_sessid())
 {
 
-    Option::set($module_id, "CHECK_PHONE_MLIFE", trim($_REQUEST["CHECK_PHONE_MLIFE"]), "");
-    Option::set($module_id, "SEND_SMS_MLIFE", trim($_REQUEST["SEND_SMS_MLIFE"]), "");
-    Option::set($module_id, "MAX_TIME", preg_replace('/([^0-9])/','',$_REQUEST["MAX_TIME"]), "");
-    Option::set($module_id, "MAX_CHECK", preg_replace('/([^0-9])/','',$_REQUEST["MAX_CHECK"]), "");
+    Option::set($module_id, "CHECK_PHONE_MLIFE", trim($_REQUEST["CHECK_PHONE_MLIFE"]));
+    Option::set($module_id, "SEND_SMS_MLIFE", trim($_REQUEST["SEND_SMS_MLIFE"]));
+    Option::set($module_id, "MAX_TIME", preg_replace('/([^0-9])/','',$_REQUEST["MAX_TIME"]));
+    Option::set($module_id, "MAX_CHECK", preg_replace('/([^0-9])/','',$_REQUEST["MAX_CHECK"]));
+    Option::set($module_id, "PHONE_LIMIT_H", preg_replace('/([^0-9])/','',$_REQUEST["PHONE_LIMIT_H"]));
+    Option::set($module_id, "PHONE_LIMIT_DAY", preg_replace('/([^0-9])/','',$_REQUEST["PHONE_LIMIT_DAY"]));
+    Option::set($module_id, "IP_LIMIT_H", preg_replace('/([^0-9])/','',$_REQUEST["IP_LIMIT_H"]));
+    Option::set($module_id, "IP_LIMIT_DAY", preg_replace('/([^0-9])/','',$_REQUEST["IP_LIMIT_DAY"]));
+    Option::set($module_id, "DEF_LIMIT_H", preg_replace('/([^0-9])/','',$_REQUEST["DEF_LIMIT_H"]));
+    Option::set($module_id, "DEF_LIMIT_DAY", preg_replace('/([^0-9])/','',$_REQUEST["DEF_LIMIT_DAY"]));
 
 }
 
@@ -44,7 +50,7 @@ $aTabs[] = array(
     "TITLE" => Loc::getMessage('AWZ_AUTFORM_OPT_SECT3')
 );
 
-$tabControl = new \CAdminTabControl("tabControl", $aTabs);
+$tabControl = new CAdminTabControl("tabControl", $aTabs);
 $tabControl->Begin();
 ?>
 <style>.adm-workarea option:checked {background-color: rgb(206, 206, 206);}</style>
@@ -67,6 +73,76 @@ $tabControl->BeginNextTab();
     <td>
         <?$val = Option::get($module_id, "MAX_CHECK", "3", "");?>
         <input type="text" size="35" maxlength="255" value="<?=$val?>" name="MAX_CHECK"/>
+    </td>
+</tr>
+
+
+<tr class="heading">
+    <td colspan="2">
+        <?=Loc::getMessage('AWZ_AUTFORM_OPT_LIMITS_TITLE')?>
+    </td>
+</tr>
+
+<tr>
+    <td><?=Loc::getMessage('AWZ_AUTFORM_OPT_DEF_LIMIT_DAY')?></td>
+    <td>
+        <?$val = Option::get($module_id, "DEF_LIMIT_DAY", "5000", "");?>
+        <input type="text" size="35" maxlength="255" value="<?=$val?>" name="DEF_LIMIT_DAY"/>
+    </td>
+</tr>
+<tr>
+    <td><?=Loc::getMessage('AWZ_AUTFORM_OPT_DEF_LIMIT_H')?></td>
+    <td>
+        <?$val = Option::get($module_id, "DEF_LIMIT_H", "500", "");?>
+        <input type="text" size="35" maxlength="255" value="<?=$val?>" name="DEF_LIMIT_H"/>
+    </td>
+</tr>
+
+<tr class="heading">
+    <td colspan="2">
+        <?=Loc::getMessage('AWZ_AUTFORM_OPT_LIMITS_USER_TITLE')?>
+    </td>
+</tr>
+
+<tr>
+    <td><?=Loc::getMessage('AWZ_AUTFORM_OPT_DEF_LIMIT_DAY')?></td>
+    <td>
+        <?$val = Option::get($module_id, "IP_LIMIT_DAY", "100", "");?>
+        <input type="text" size="35" maxlength="255" value="<?=$val?>" name="IP_LIMIT_DAY"/>
+    </td>
+</tr>
+<tr>
+    <td><?=Loc::getMessage('AWZ_AUTFORM_OPT_DEF_LIMIT_H')?></td>
+    <td>
+        <?$val = Option::get($module_id, "IP_LIMIT_H", "10", "");?>
+        <input type="text" size="35" maxlength="255" value="<?=$val?>" name="IP_LIMIT_H"/>
+    </td>
+</tr>
+
+<tr class="heading">
+    <td colspan="2">
+        <?=Loc::getMessage('AWZ_AUTFORM_OPT_LIMITS_PHONE_TITLE')?>
+    </td>
+</tr>
+
+<tr>
+    <td><?=Loc::getMessage('AWZ_AUTFORM_OPT_DEF_LIMIT_DAY')?></td>
+    <td>
+        <?$val = Option::get($module_id, "PHONE_LIMIT_DAY", "100", "");?>
+        <input type="text" size="35" maxlength="255" value="<?=$val?>" name="PHONE_LIMIT_DAY"/>
+    </td>
+</tr>
+<tr>
+    <td><?=Loc::getMessage('AWZ_AUTFORM_OPT_DEF_LIMIT_H')?></td>
+    <td>
+        <?$val = Option::get($module_id, "PHONE_LIMIT_H", "10", "");?>
+        <input type="text" size="35" maxlength="255" value="<?=$val?>" name="PHONE_LIMIT_H"/>
+    </td>
+</tr>
+
+<tr class="heading">
+    <td colspan="2">
+        <?=Loc::getMessage('AWZ_AUTFORM_OPT_SEND_CODE_TITLE')?>
     </td>
 </tr>
 

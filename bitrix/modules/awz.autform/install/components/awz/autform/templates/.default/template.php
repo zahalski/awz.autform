@@ -10,7 +10,12 @@ use Bitrix\Main\Localization\Loc;
  * @var CBitrixComponentTemplate $this
  * @var string $componentPath
  * @var string $templateName
+ * @var string $templateFolder
+ * @var array $arParams
  */
+
+CJSCore::Init('ajax');
+$this->addExternalCss($templateFolder.'/theme/'.$arParams['THEME'].'.css');
 
 $autFormId = 'awz_autform'.$this->randString();
 $arParams['autFormId'] = $autFormId;
@@ -28,7 +33,11 @@ $messKeys = array(
     'AWZ_AUTFORM_TMPL_LABEL_BTN_CODE',
     'AWZ_AUTFORM_TMPL_LABEL_BTN_CODE2',
     'AWZ_AUTFORM_TMPL_LABEL_BTN_CHECKCODE',
-    'AWZ_AUTFORM_TMPL_LOADER'
+    'AWZ_AUTFORM_TMPL_LABEL_BTN_REGISTER',
+    'AWZ_AUTFORM_TMPL_LOADER',
+    'AWZ_AUTFORM_TMPL_LABEL_BTN_READ',
+    'AWZ_AUTFORM_TMPL_LABEL_AGREEMENT',
+    'AWZ_AUTFORM_TMPL_LABEL_PHONE_LOGIN'
 );
 
 $arLang = array();
@@ -39,27 +48,49 @@ foreach($messKeys as $code){
 ?>
 <div id="<?=$autFormId?>" class="awz-autform-link-block">
     <?php
-    /** @var \Bitrix\Main\Page\FrameBuffered $frame */
     $frame = $this->createFrame($autFormId, false)->begin();
-    ?><a id="<?=$autFormId?>_lnk" href="#"><?=Loc::getMessage('AWZ_AUTFORM_TMPL_LINK')?></a><?
+    ?>
+    <?global $USER;?>
+    <?if($USER->IsAuthorized()){?>
+        <a href="<?=$arParams['PERSONAL_LINK']?>"><?=Loc::getMessage('AWZ_AUTFORM_TMPL_PERSONAL_LINK')?></a>
+    <?}else{?>
+        <a id="<?=$autFormId?>_lnk" href="#"><?=Loc::getMessage('AWZ_AUTFORM_TMPL_LINK')?></a>
+    <?}?>
+    <?
     $frame->beginStub();
     $arResult['COMPOSITE_STUB'] = 'Y';
-    ?><a id="<?=$autFormId?>_lnk" href="#"><?=Loc::getMessage('AWZ_AUTFORM_TMPL_LINK')?></a><?
+    //тут заглушка по умолчанию
+    ?>
+    <span class="awz-autform-link-stub"></span>
+    <?
     unset($arResult['COMPOSITE_STUB']);
     $frame->end();
     ?>
 </div>
 <script>
-    var options = {
-        'theme': '<?=$arParams['THEME']?>',
-        'lang':<?=CUtil::PHPToJSObject($arLang);?>
-    };
-    <?if(empty($arParams['LOGIN_GROUPS']) && !empty($arParams['LOGIN_SMS_GROUPS'])){?>
-    options.mode = 'loginsms';
-    <?}?>
-    <?if(!empty($arParams['LOGIN_GROUPS']) && empty($arParams['LOGIN_SMS_GROUPS'])){?>
-    options.mode = 'loginnosms';
-    <?}?>
+    <?$options = array(
+        'theme'=>$arParams['THEME'],
+        'lang'=>$arLang,
+        'AGREEMENT'=>$arParams['AGREEMENT'],
+        'modes'=>array(),
+        'mode'=>false,
+        'hiddenReg'=>$arParams['REGISTER_LOGIN'],
+        'checkLogin'=>$arParams['CHECK_LOGIN']
+    );?>
+    <?
+    if(!empty($arParams['LOGIN_GROUPS'])){
+        $options['modes'][] = 'login';
+    }
+    if(!empty($arParams['LOGIN_SMS_GROUPS'])){
+        $options['modes'][] = 'loginsms';
+    }
+    if(!empty($arParams['REGISTER_GROUPS'])){
+        $options['modes'][] = 'register';
+    }
+    if(!empty($options['modes'])){
+        $options['mode'] = $options['modes'][0];
+    }
+    ?>
     var <?=$autFormId?> = new AwzAutFormComponent;
     <?=$autFormId?>.siteId = '<?=SITE_ID?>';
     <?=$autFormId?>.autFormId = '<?=$autFormId?>';
@@ -67,5 +98,5 @@ foreach($messKeys as $code){
     <?=$autFormId?>.templateName = '<?=$templateName?>';
     <?=$autFormId?>.signedParameters = '<?=$this->getComponent()->getSignedParameters()?>';
     <?=$autFormId?>.componentName = '<?=$this->getComponent()->getName()?>';
-    <?=$autFormId?>.activate(options);
+    <?=$autFormId?>.activate(<?=CUtil::PHPToJSObject($options)?>);
 </script>
