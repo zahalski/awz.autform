@@ -36,7 +36,8 @@ $messKeys = array(
     'AWZ_AUTFORM_TMPL_LABEL_BTN_REGISTER',
     'AWZ_AUTFORM_TMPL_LOADER',
     'AWZ_AUTFORM_TMPL_LABEL_BTN_READ',
-    'AWZ_AUTFORM_TMPL_LABEL_AGREEMENT'
+    'AWZ_AUTFORM_TMPL_LABEL_AGREEMENT',
+    'AWZ_AUTFORM_TMPL_LABEL_PHONE_LOGIN'
 );
 
 $arLang = array();
@@ -73,7 +74,8 @@ foreach($messKeys as $code){
         'AGREEMENT'=>$arParams['AGREEMENT'],
         'modes'=>array(),
         'mode'=>false,
-        'hiddenReg'=>$arParams['REGISTER_LOGIN']
+        'hiddenReg'=>$arParams['REGISTER_LOGIN'],
+        'checkLogin'=>$arParams['CHECK_LOGIN']
     );?>
     <?
     if(!empty($arParams['LOGIN_GROUPS'])){

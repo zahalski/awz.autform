@@ -106,6 +106,12 @@ $arComponentParameters = array(
             "TYPE" => "CHECKBOX",
             "DEFAULT" => "N",
         ),
+        "CHECK_LOGIN" => array(
+            "PARENT" => "LOGIN",
+            "NAME" => Loc::getMessage('AWZ_AUTFORM_PARAM_LABEL_CHECK_LOGIN'),
+            "TYPE" => "CHECKBOX",
+            "DEFAULT" => "N",
+        ),
     ),
 );
 

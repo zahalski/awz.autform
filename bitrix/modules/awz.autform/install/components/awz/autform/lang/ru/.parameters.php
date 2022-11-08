@@ -19,3 +19,4 @@ $MESS['AWZ_AUTFORM_PARAM_LABEL_FIND_TYPE_USER'] = 'пользователь';
 $MESS['AWZ_AUTFORM_PARAM_LABEL_FIND_TYPE_ORDER'] = 'заказ';
 $MESS['AWZ_AUTFORM_PARAM_LABEL_SALE_PROP'] = 'Код свойства заказа с номером телефона';
 $MESS['AWZ_AUTFORM_PARAM_LABEL_REGISTER_LOGIN'] = 'Объединить регистрацию и авторизацию по смс';
+$MESS['AWZ_AUTFORM_PARAM_LABEL_CHECK_LOGIN'] = 'Искать пользователя по логину';

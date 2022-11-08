@@ -122,7 +122,8 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
             'SALE_PROP',
             'REGISTER_LOGIN',
             'LOGIN_GROUPS_DEL2',
-            'LOGIN_GROUPS_DEL3'
+            'LOGIN_GROUPS_DEL3',
+            'CHECK_LOGIN'
         ];
     }
 
@@ -145,6 +146,9 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
 
         if($arParams['REGISTER_LOGIN']!='Y')
             $arParams['REGISTER_LOGIN'] = 'N';
+
+        if($arParams['CHECK_LOGIN']!='Y')
+            $arParams['CHECK_LOGIN'] = 'N';
 
         if(!$arParams['SALE_PROP'])
             $arParams['SALE_PROP'] = 'PHONE';
@@ -233,9 +237,9 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
      * Getting once error with the necessary code.
      *
      * @param string|int $code Code of error.
-     * @return Error
+     * @return Error|null
      */
-    public function getErrorByCode($code): Error
+    public function getErrorByCode($code): ?Error
     {
         return $this->errorCollection->getErrorByCode($code);
     }
@@ -263,7 +267,11 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
         }
 
         if(!$phone){
-            $this->addError(Loc::getMessage('AWZ_AUTFORM_MODULE_NOT_PHONE'));
+            if($parameters['CHECK_LOGIN']==='Y'){
+                $this->addError(Loc::getMessage('AWZ_AUTFORM_MODULE_NOT_PHONE_LOGIN'));
+            }else{
+                $this->addError(Loc::getMessage('AWZ_AUTFORM_MODULE_NOT_PHONE'));
+            }
             return null;
         }
         if(!$password){
@@ -276,17 +284,24 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
             return null;
         }
 
-        $phone = $this->checkPhone($phone);
-
-        if(!empty($this->getErrors())) {
-            return null;
-        }
-
-        $userId = $this->findUserFromPhone($phone);
+        $userId = $this->findUserFromLogin($phone);
 
         if(!$userId){
-            $this->addError(Loc::getMessage('AWZ_AUTFORM_MODULE_USER_NOT_FOUND'));
-            return null;
+            $phone = $this->checkPhone($phone);
+
+            if(!empty($this->getErrors())) {
+                if($parameters['CHECK_LOGIN']==='Y'){
+                    $this->addError(Loc::getMessage('AWZ_AUTFORM_MODULE_NOT_LOGIN'));
+                }
+                return null;
+            }
+
+            $userId = $this->findUserFromPhone($phone);
+
+            if(!$userId){
+                $this->addError(Loc::getMessage('AWZ_AUTFORM_MODULE_USER_NOT_FOUND'));
+                return null;
+            }
         }
 
         if(!$this->checkRightGroup('LOGIN_GROUPS')){
@@ -807,6 +822,119 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
     }
 
     /**
+     * Поиск юзера по логину
+     *
+     * @param string $login
+     * @return int|null
+     * @throws ArgumentException
+     * @throws SystemException
+     */
+    protected function findUserFromLogin($login): ?int
+    {
+        $parameters = $this->arParams;
+
+        $login = trim($login);
+
+        if(!$login){
+            return null;
+        }
+
+        $event = new Event(
+            'awz.autform', Events::FIND_USER_FROM_LOGIN,
+            array(
+                'login'=>$login,
+                'params'=>$parameters,
+                'request'=>$this->request
+            )
+        );
+        $event->send();
+
+        $findUser = 0;
+        if ($event->getResults()) {
+            foreach ($event->getResults() as $eventResult) {
+                if ($eventResult->getType() == EventResult::SUCCESS) {
+                    $r = $eventResult->getParameters();
+                    $r = $r['result'];
+                    if($r instanceof Result){
+                        if($r->isSuccess()){
+                            $data = $r->getData();
+                            if(isset($data['user'])){
+                                $findUser = $data['user'];
+                            }
+                        }else{
+                            foreach($r->getErrors() as $error){
+                                $this->addError($error);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if($findUser){
+            return (int) $findUser;
+        }
+        if(!empty($this->getErrors())){
+            return null;
+        }
+
+        $filter = array(
+            array(
+                'LOGIC'=>'OR',
+                '=LOGIN'=>$login
+            ),
+            '!LOGIN'=>false
+        );
+
+        $main_query = new Query(UserTable::getEntity());
+
+        if(!empty($parameters['LOGIN_GROUPS_DEL2'])){
+            $main_query->registerRuntimeField(
+                'UGR', array(
+                         'data_type'=>'Bitrix\Main\UserGroupTable',
+                         'reference'=> array('=this.ID' => 'ref.USER_ID')
+                     )
+            );
+            $filter['=UGR.GROUP_ID'] = $parameters['LOGIN_GROUPS_DEL2'];
+        }
+
+        if($parameters['LOGIN_GROUPS_DEL3']){
+            $filter['!ID'] = explode(',',$parameters['LOGIN_GROUPS_DEL3']);
+            $filter['!ID'][] = false;
+        }
+
+        $main_query->setOrder(array('ID'=>'DESC'));
+        $main_query->setLimit(1);
+        $main_query->setFilter($filter);
+        $main_query->setSelect(array('ID'));
+        $rs = $main_query->exec();
+        $resUsers = $rs->fetch();
+
+        $userCandidate = false;
+
+        if($resUsers){
+            $userCandidate = $resUsers['ID'];
+        }
+
+        //обязательно проверка групп юзера
+        if($userCandidate){
+            $this->userGroups = array();
+
+            $r = UserGroupTable::getList(
+                array(
+                    'select'=>array('GROUP_ID'),
+                    'filter'=>array('=USER_ID'=>$userCandidate)
+                )
+            );
+            while($data = $r->fetch()){
+                $this->userGroups[] = $data['GROUP_ID'];
+            }
+            return (int) $userCandidate;
+        }
+
+        return null;
+    }
+
+    /**
      * @param $phone
      * @return int|null
      * @throws ArgumentException
@@ -990,6 +1118,8 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
                 '!LOGIN'=>false
             );
 
+
+
             $main_query = new Query(UserTable::getEntity());
 
             if(!empty($parameters['LOGIN_GROUPS_DEL2'])){
@@ -1006,6 +1136,8 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
                 $filter['!ID'] = explode(',',$parameters['LOGIN_GROUPS_DEL3']);
                 $filter['!ID'][] = false;
             }
+
+
 
             $main_query->setOrder(array('ID'=>'DESC'));
             $main_query->setLimit(1);

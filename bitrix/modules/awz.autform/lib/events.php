@@ -25,6 +25,11 @@ class Events {
     const FIND_USER = 'onFindUser';
 
     /**
+     * Переопределение поиска ид юзера по логину
+     */
+    const FIND_USER_FROM_LOGIN = 'onFindUserLogin';
+
+    /**
      * Своя проверка лимитов
      */
     const CHECK_LIMITS = 'onCheckLimits';

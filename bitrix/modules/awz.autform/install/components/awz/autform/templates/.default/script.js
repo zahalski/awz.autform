@@ -51,6 +51,7 @@ AwzAutFormComponent.prototype = {
         if(typeof options !== 'object') options = {};
         this.theme = (!!options.theme ? options.theme : false) || 'red';
         this.hiddenReg = (!!options.hiddenReg ? (options.hiddenReg==='Y') : false);
+        this.checkLogin = (!!options.checkLogin ? (options.checkLogin==='Y') : false);
         this.AGREEMENT = (!!options.AGREEMENT ? options.AGREEMENT : false) || '';
         this.lang = (!!options.lang ? options.lang : false) || {};
         if(typeof this.lang !==  'object') this.lang = {};
@@ -131,6 +132,14 @@ AwzAutFormComponent.prototype = {
         var lnk_active = BX(this.autFormId+'_link_'+this.modeOptions[this.mode]['active_link']);
         if(lnk_active)
             BX.addClass(lnk_active, 'active');
+
+        if(this.checkLogin && this.mode && BX(this.autFormId+'_phone_label')){
+            if(['login','loginnosms'].indexOf(this.mode)>-1){
+                BX.adjust(BX(this.autFormId+'_phone_label'), {text: this.loc('AWZ_AUTFORM_TMPL_LABEL_PHONE_LOGIN')});
+            }else{
+                BX.adjust(BX(this.autFormId+'_phone_label'), {text: this.loc('AWZ_AUTFORM_TMPL_LABEL_PHONE')});
+            }
+        }
 
         var len_fix = 0;
         if(typeof this.modes === 'object')
@@ -622,7 +631,7 @@ AwzAutFormComponent.prototype = {
                     children: [
                         BX.create({
                             tag: 'label',
-                            props: {for: this.autFormId+'_phone'},
+                            props: {for: this.autFormId+'_phone', id: this.autFormId+'_phone_label'},
                             text: this.loc('AWZ_AUTFORM_TMPL_LABEL_PHONE')
                         }),
                         BX.create({

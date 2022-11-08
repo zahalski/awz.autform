@@ -6,6 +6,7 @@ $MESS['AWZ_AUTFORM_TMPL_CLOSE'] = 'Закрыть';
 $MESS['AWZ_AUTFORM_TMPL_LINK'] = 'Вход/Регистрация';
 $MESS['AWZ_AUTFORM_TMPL_ERR_AJAX'] = 'Ошибка обработки запроса';
 $MESS['AWZ_AUTFORM_TMPL_LABEL_PHONE'] = 'Номер телефона';
+$MESS['AWZ_AUTFORM_TMPL_LABEL_PHONE_LOGIN'] = 'Логин или телефон';
 $MESS['AWZ_AUTFORM_TMPL_LABEL_PASSW'] = 'Пароль';
 $MESS['AWZ_AUTFORM_TMPL_LABEL_SMSCODE'] = 'Код из смс';
 $MESS['AWZ_AUTFORM_TMPL_LABEL_BTN_AUTH'] = 'Войти';
