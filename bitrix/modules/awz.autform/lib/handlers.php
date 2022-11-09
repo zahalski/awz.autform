@@ -41,9 +41,6 @@ class Handlers {
             "NAME" => Loc::getMessage('AWZ_AUTFORM_HANDLERS_MLIFE_SMS_TMPL_NAME')
         );
 
-        //echo'<pre>';print_r($arParam);echo'</pre>';
-        //die();
-
         return new EventResult(
             EventResult::SUCCESS,
             $arParam
@@ -59,7 +56,6 @@ class Handlers {
      */
     public static function checkPhone(Event $event): ?EventResult
     {
-
         if(Option::get('awz.autform', 'CHECK_PHONE_MLIFE', 'N', '')!='Y'){
             return null;
         }

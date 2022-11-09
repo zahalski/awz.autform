@@ -21,7 +21,6 @@ class Helper {
      */
     public static function getPhoneCandidates(string $phone, int $countryCode=7): array
     {
-
         $phoneArray = array(
             $phone
         );
@@ -38,7 +37,6 @@ class Helper {
         }
 
         return $phoneArray;
-
     }
 
     /**
@@ -50,34 +48,19 @@ class Helper {
      */
     public static function checkLimits(string $phone, string $ip): Result
     {
-
         $result = new Result();
+
         $okData = array('status'=>'ok');
 
         $event = new Event(
             'awz.autform', Events::CHECK_LIMITS,
             array(
                 'phone'=>$phone,
-                'ip'=>$ip
+                'ip'=>$ip,
+                'result'=>$result
             )
         );
         $event->send();
-
-        if ($event->getResults()) {
-            foreach ($event->getResults() as $eventResult) {
-                if ($eventResult->getType() == EventResult::SUCCESS) {
-                    $r = $eventResult->getParameters();
-                    $r = $r['result'];
-                    if($r instanceof Result){
-                        if($r->isSuccess()){
-                            $result->setData($okData);
-                        }elseif(!empty($r->getErrors())){
-                            $result->addErrors($r->getErrors());
-                        }
-                    }
-                }
-            }
-        }
 
         if(empty($result->getData()) && empty($result->getErrors())){
 
