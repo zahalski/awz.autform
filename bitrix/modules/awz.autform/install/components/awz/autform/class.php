@@ -258,6 +258,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
      */
     public function checkAuthAction(string $phone, string $password): ?array
     {
+
         $parameters = $this->arParams;
 
         if($parameters['AGREEMENT'] && $this->request->get('AGREEMENT')!='Y'){
@@ -347,6 +348,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
      */
     public function checkRegisterAction(string $phone, string $code): ?array
     {
+
         $parameters = $this->arParams;
 
         if(empty($parameters['REGISTER_GROUPS'])){
@@ -490,6 +492,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
             );
 
         }
+
     }
 
 
@@ -506,6 +509,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
      */
     public function checkCodeAction(string $phone, string $code): ?array
     {
+
         $parameters = $this->arParams;
 
         if($parameters['AGREEMENT'] && $this->request->get('AGREEMENT')!='Y'){
@@ -600,6 +604,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
             );
 
         }
+
     }
 
 
@@ -616,6 +621,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
      */
     public function getCodeAction(string $phone, string $fmode): ?array
     {
+
         $parameters = $this->arParams;
 
         if($parameters['AGREEMENT'] && $this->request->get('AGREEMENT')!='Y'){
@@ -657,12 +663,16 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
         }
         if(!$registerMode){
             if(!$userId){
+
                 if($parameters['REGISTER_LOGIN'] == 'Y'){
+
                     $registerMode = true;
+
                 }else{
                     $this->addError(Loc::getMessage('AWZ_AUTFORM_MODULE_USER_NOT_FOUND'));
                     return null;
                 }
+
             }else{
                 if(!$this->checkRightGroup('LOGIN_SMS_GROUPS')){
                     $this->addError(Loc::getMessage('AWZ_AUTFORM_MODULE_ERR_GROUP_LOGIN_SMS'));
@@ -675,12 +685,14 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
         $code = $this->generateCode($phone);
 
         if(!$code){
+
             if($this->getErrorByCode(105)){
                 return array(
                     'phone'=>$phone,
                     'step'=>'active-code'.($registerMode ? '-register' : '')
                 );
             }
+
             return null;
         }
 
@@ -700,18 +712,15 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
         if ($event->getResults()) {
             foreach ($event->getResults() as $eventResult) {
                 if ($eventResult->getType() == EventResult::SUCCESS) {
-                    if($eventResultData = $eventResult->getParameters()){
-                        if(!isset($eventResultData['result'])) continue;
-                        $r = $eventResultData['result'];
-                        if($r instanceof Result){
-                            if($r->isSuccess()){
-                                $result = $r->getData();
-                            }else{
-                                foreach($r->getErrors() as $error){
-                                    $this->addError($error);
-                                }
+                    $r = $eventResult->getParameters();
+                    $r = $r['result'];
+                    if($r instanceof Result){
+                        if($r->isSuccess()){
+                            $result = $r->getData();
+                        }else{
+                            foreach($r->getErrors() as $error){
+                                $this->addError($error);
                             }
-                            break;
                         }
                     }
                 }
@@ -753,6 +762,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
      */
     public function getAgreementAction(): ?array
     {
+
         $parameters = $this->arParams;
 
         $agreement = $parameters['AGREEMENT'];
@@ -772,6 +782,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
         return array(
             'text'=>$agreementOb->getText()
         );
+
     }
 
     /**
@@ -842,21 +853,18 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
         if ($event->getResults()) {
             foreach ($event->getResults() as $eventResult) {
                 if ($eventResult->getType() == EventResult::SUCCESS) {
-                    if($eventResultData = $eventResult->getParameters()){
-                        if(!isset($eventResultData['result'])) continue;
-                        $r = $eventResultData['result'];
-                        if($r instanceof Result){
-                            if($r->isSuccess()){
-                                $data = $r->getData();
-                                if(isset($data['user'])){
-                                    $findUser = $data['user'];
-                                }
-                            }else{
-                                foreach($r->getErrors() as $error){
-                                    $this->addError($error);
-                                }
+                    $r = $eventResult->getParameters();
+                    $r = $r['result'];
+                    if($r instanceof Result){
+                        if($r->isSuccess()){
+                            $data = $r->getData();
+                            if(isset($data['user'])){
+                                $findUser = $data['user'];
                             }
-                            break;
+                        }else{
+                            foreach($r->getErrors() as $error){
+                                $this->addError($error);
+                            }
                         }
                     }
                 }
@@ -956,21 +964,18 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
         if ($event->getResults()) {
             foreach ($event->getResults() as $eventResult) {
                 if ($eventResult->getType() == EventResult::SUCCESS) {
-                    if($eventResultData = $eventResult->getParameters()){
-                        if(!isset($eventResultData['result'])) continue;
-                        $r = $eventResultData['result'];
-                        if($r instanceof Result){
-                            if($r->isSuccess()){
-                                $data = $r->getData();
-                                if(isset($data['user'])){
-                                    $findUser = $data['user'];
-                                }
-                            }else{
-                                foreach($r->getErrors() as $error){
-                                    $this->addError($error);
-                                }
+                    $r = $eventResult->getParameters();
+                    $r = $r['result'];
+                    if($r instanceof Result){
+                        if($r->isSuccess()){
+                            $data = $r->getData();
+                            if(isset($data['user'])){
+                                $findUser = $data['user'];
                             }
-                            break;
+                        }else{
+                            foreach($r->getErrors() as $error){
+                                $this->addError($error);
+                            }
                         }
                     }
                 }
@@ -983,6 +988,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
             return null;
         }
 
+
         $phoneArray = Helper::getPhoneCandidates(
             $phone,
             $parameters['COUNTRY_CODE']
@@ -993,7 +999,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
             array(
                 'preparePhone'=>$preparePhone,
                 'phone'=>$phone,
-                'phoneArray'=>&$phoneArray,
+                'phoneArray'=>$phoneArray,
                 'params'=>$parameters,
                 'request'=>$this->request
             )
@@ -1004,21 +1010,17 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
         if ($event->getResults()) {
             foreach ($event->getResults() as $eventResult) {
                 if ($eventResult->getType() == EventResult::SUCCESS) {
-                    if($eventResultData = $eventResult->getParameters()){
-                        if(!isset($eventResultData)) continue;
-                        $r = $eventResultData['result'];
-                        if($r instanceof Result){
-                            if($r->isSuccess()){
-                                $data = $r->getData();
-                                if(isset($data['phoneArray'])){
-                                    //если нужно прекратить применение обработчиков
-                                    $phoneFormated = $data['phoneArray'];
-                                    break;
-                                }
-                            }else{
-                                foreach($r->getErrors() as $error){
-                                    $this->addError($error);
-                                }
+                    $r = $eventResult->getParameters();
+                    $r = $r['result'];
+                    if($r instanceof Result){
+                        if($r->isSuccess()){
+                            $data = $r->getData();
+                            if(isset($data['phoneArray'])){
+                                $phoneFormated = $data['phoneArray'];
+                            }
+                        }else{
+                            foreach($r->getErrors() as $error){
+                                $this->addError($error);
                             }
                         }
                     }
@@ -1033,6 +1035,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
             $parameters['SALE_PROP'] && $parameters['FIND_TYPE'] &&
             strpos($parameters['FIND_TYPE'], 'order')!==false)
         {
+
             $filter = array(
                 //'!ORD.CANCELED'=>'Y',
                 '!ORD.ID'=>false,
@@ -1086,6 +1089,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
             //die();
 
             if($resUsers) $findOrderUser = $resUsers['ORD_USER_ID'];
+
         }
 
         //юзер найден в заказе, больше не ищем
@@ -1102,8 +1106,8 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
         }
 
         //продолжаем поиск стандартного битрикс юзера
-        if(!$userCandidate && strpos($parameters['FIND_TYPE'], 'user')!==false)
-        {
+        if(!$userCandidate && strpos($parameters['FIND_TYPE'], 'user')!==false){
+
             $filter = array(
                 array(
                     'LOGIC'=>'OR',
@@ -1113,6 +1117,8 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
                 ),
                 '!LOGIN'=>false
             );
+
+
 
             $main_query = new Query(UserTable::getEntity());
 
@@ -1130,6 +1136,8 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
                 $filter['!ID'] = explode(',',$parameters['LOGIN_GROUPS_DEL3']);
                 $filter['!ID'][] = false;
             }
+
+
 
             $main_query->setOrder(array('ID'=>'DESC'));
             $main_query->setLimit(1);
@@ -1176,12 +1184,13 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
      */
     private function checkPhone(string $phone): string
     {
+
         $parameters = $this->arParams;
 
         $event = new Event(
             'awz.autform', Events::CHECK_PHONE,
             array(
-                'phone'=>&$phone,
+                'phone'=>$phone,
                 'params'=>$parameters,
                 'request'=>$this->request
             )
@@ -1192,21 +1201,17 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
         if ($event->getResults()) {
             foreach ($event->getResults() as $eventResult) {
                 if ($eventResult->getType() == EventResult::SUCCESS) {
-                    if($eventResultData = $eventResult->getParameters()){
-                        if(!isset($eventResultData['result'])) continue;
-                        $r = $eventResultData['result'];
-                        if($r instanceof Result){
-                            if($r->isSuccess()){
-                                $data = $r->getData();
-                                //если нужно прекратить применение обработчиков
-                                if(isset($data['phone'])){
-                                    $phoneFormated = (string) $data['phone'];
-                                    break;
-                                }
-                            }else{
-                                foreach($r->getErrors() as $error){
-                                    $this->addError($error);
-                                }
+                    $r = $eventResult->getParameters();
+                    $r = $r['result'];
+                    if($r instanceof Result){
+                        if($r->isSuccess()){
+                            $data = $r->getData();
+                            if(isset($data['phone'])){
+                                $phoneFormated = $data['phone'];
+                            }
+                        }else{
+                            foreach($r->getErrors() as $error){
+                                $this->addError($error);
                             }
                         }
                     }
@@ -1252,6 +1257,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
      */
     private function generateCode(string $phone): ?string
     {
+
         if(!$phone){
             $this->addError(Loc::getMessage('AWZ_AUTFORM_MODULE_NOT_PHONE'));
             return null;

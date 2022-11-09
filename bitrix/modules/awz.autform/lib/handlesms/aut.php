@@ -23,6 +23,7 @@ class Aut implements SmsForm {
 
     public static function tmplHtml($value=""): string
     {
+
         if(!$value) serialize(array());
 
         $data = unserialize($value);
@@ -49,10 +50,12 @@ class Aut implements SmsForm {
         $html .= '</tr>';
 
         return $html;
+
     }
 
     public static function tmplHtmlSave($arFields=array()): array
     {
+
         $PARAMS = array(
             "PHONE"=>trim($_REQUEST['PARAMS_PHONE']),
             "APPSMS"=>trim($_REQUEST['PARAMS_APPSMS'])
@@ -60,6 +63,7 @@ class Aut implements SmsForm {
         $arFields['PARAMS'] = serialize($PARAMS);
 
         return $arFields;
+
     }
 
     /**
@@ -72,6 +76,7 @@ class Aut implements SmsForm {
      */
     public static function OnAfterAddEvent(Event $event): ?EventResult
     {
+
         if(Option::get('awz.autform', 'SEND_SMS_MLIFE', 'N', '')!='Y'){
             return null;
         }
@@ -179,6 +184,7 @@ class Aut implements SmsForm {
             EventResult::SUCCESS,
             array('result'=>$result)
         );
+
     }
 
 }
