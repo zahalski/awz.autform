@@ -24,13 +24,23 @@ class CBitrixPersonalOrderListComponentCustom extends CBitrixPersonalOrderListCo
         $userId = $USER->GetID();
         if(!$userId) return null;
 
+        if(!\Bitrix\Main\Loader::includeModule('awz.autform'))
+            return null;
+
         if($phone = Helper::getPhone($userId)){
             //make $phone = array('+79215554433','79215554433','9215554433') candidates;
+            $phones = Helper::getPhonesCandidate($phone);
             unset($this->filter['USER_ID']);
             $this->filter[] = array(
                 'LOGIC'=>'OR',
-                array('=USER_ID'=>$userId, '=PROPERTY.CODE'=>'PHONE'),
-                array('=PROPERTY.CODE'=>'PHONE', '=PROPERTY.VALUE'=>$phone),
+                array(
+                    '=USER_ID'=>$userId,
+                    '=PROPERTY.CODE'=>Helper::ORDER_PHONE_FIELD_CODE
+                ),
+                array(
+                    '=PROPERTY.CODE'=>Helper::ORDER_PHONE_FIELD_CODE,
+                    '=PROPERTY.VALUE'=>$phones
+                ),
             );
         }
 

@@ -13,7 +13,7 @@ class UfEntityTable extends \Bitrix\Main\ORM\Data\DataManager{
     {
         return array(
             (new \Bitrix\Main\ORM\Fields\IntegerField('VALUE_ID'))->configurePrimary(),
-            (new \Bitrix\Main\ORM\Fields\StringField('UF_CHECK_PHONE')),
+            (new \Bitrix\Main\ORM\Fields\StringField(Helper::USER_UF_CHECKED_CODE)),
         );
     }
 
