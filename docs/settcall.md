@@ -20,6 +20,6 @@
 
 ![](https://zahalski.dev/images/modules/awz.autform/011.png)
 
-## 4. Готово. Отправка кодов настроена.
+## 3. Готово. Отправка кодов настроена.
 
 <!-- settcall-end -->
