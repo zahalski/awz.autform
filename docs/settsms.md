@@ -5,6 +5,7 @@
 ## 1. Устанавливаем и настраиваем модуль mlife.smsservices
 
 Ссылка на модуль в [Маркетплейс](https://marketplace.1c-bitrix.ru/solutions/mlife.smsservices/) 1с-Битрикс
+
 Ссылка на модуль на [bitbucket](https://bitbucket.org/artlux/mlife.smsservices/wiki/Home)
 
 ## 2. Переходим в настройки модуля AWZ: Форма авторизации и включаем опцию отправки смс через модуль mlife.smsservices

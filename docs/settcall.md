@@ -3,7 +3,9 @@
 ## 1. Устанавливаем и настраиваем модуль awz.flashcallapi
 
 Ссылка на модуль в [Маркетплейс](https://marketplace.1c-bitrix.ru/solutions/awz.flashcallapi/) 1с-Битрикс
+
 Ссылка на модуль на [GitHub](https://github.com/zahalski/awz.flashcallapi/)
+
 Документация на сайте разработчика [Zahalski.dev](https://zahalski.dev/modules/awz.flashcallapi/)
 
 <!-- settcall-start -->
