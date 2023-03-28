@@ -72,7 +72,7 @@ class Helper {
             $expiredDate2 = DateTime::createFromTimestamp(time()+$maxTime-3600);
 
             $counters = array(
-                'DEF'=>array(
+                'PHONE'=>array(
                     'DAY'=>array(
                         '=PHONE'=>$phone,
                         '>EXPIRED_DATE'=>$expiredDate1
@@ -92,7 +92,7 @@ class Helper {
                         '>EXPIRED_DATE'=>$expiredDate2
                     )
                 ),
-                'PHONE'=>array(
+                'DEF'=>array(
                     'DAY'=>array(
                         '>EXPIRED_DATE'=>$expiredDate1
                     ),
