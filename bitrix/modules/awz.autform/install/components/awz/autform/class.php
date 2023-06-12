@@ -505,7 +505,7 @@ class AwzAutFormComponent extends CBitrixComponent implements Controllerable, Er
                 "PERSONAL_MOBILE"=>$phone
             );
 
-            $emailRequired = Option::get('main', 'new_user_email_required') === 'Y' ? 'Y' : 'N';
+            $emailRequired = Option::get('main', 'new_user_email_required') === 'Y' ? true : false;
             if($emailRequired){
                 $arFieldsUser['EMAIL'] = time().Random::getString(5).'@noemail.gav';
             }
