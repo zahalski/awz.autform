@@ -25,3 +25,10 @@
 3) Регистрация с помощью телефона и смс кода
 
 <!-- desc-end -->
+
+<!-- cl-start -->
+## История версий
+
+https://github.com/zahalski/awz.autform/blob/master/CHANGELOG.md
+
+<!-- cl-end -->
